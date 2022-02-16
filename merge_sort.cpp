@@ -1,67 +1,66 @@
-﻿#include <iostream>
+#include <iostream>
+#include <vector>
+#include <random>
 
-void merge(int* AP, int p, int q, int r) {
-    int n1 = q - p + 1;
-    int n2 = r - q;
-    int* L; int* R;
-    L = new int[n1 + 1];
-    R = new int[n2 + 1];
-#pragma omp parallel for
-    for (int i = 1;i <= n1; i++) {
-        L[i - 1] = AP[p + i - 1];
-    }
-#pragma omp parallel for
-    for (int j = 1;j <= n2; j++) {
-        R[j - 1] = AP[q + j];
-    }
-#pragma omp parallel for
-    for (int i = 0, j = 0, k = p; k <= r; k++) {
-        if (i < n1 && j < n2) {
-            if (L[i] <= R[j]) {
-                AP[k] = L[i];
+using namespace std;
+
+vector<int> merge(vector<int>& a, vector<int>& b) {
+    vector<int> ans;
+
+    for (int i = 0, j = 0; i < a.size() || j < b.size();) {
+        if (i >= a.size()) {
+            while (j < b.size()) {
+                ans.push_back(b[j]);
+                j++;
+            }
+            return ans;
+        }
+        if (j >= b.size()) {
+            while (i < a.size()) {
+                ans.push_back(a[i]);
                 i++;
             }
-            else {
-                AP[k] = R[j];
+            return ans;
+        }
+        if (a[i] < b[j] ) {
+            while (i < a.size() && a[i] < b[j]) {
+                ans.push_back(a[i]);
+                i++;
+            }
+        }
+        else {
+            while (j < b.size() && a[i] >= b[j]) {
+                ans.push_back(b[j]);
                 j++;
             }
         }
-        else if (i < n1) {
-            AP[k] = L[i];
-            i++;
-        }
-        else {
-            AP[k] = R[j];
-            j++;
-        }
     }
-    delete[] L; delete[] R;
+    return ans;
 }
-void merge_sort(int* AP, int p, int r) {
-    int q;
-    if (p < r) {
-        q = (p + r) / 2;
-        merge_sort(AP, p, q);
-        merge_sort(AP, q + 1, r);
-        merge(AP, p, q, r);
+
+vector<int> mergeSort(vector<int> v) {
+    if (v.size() < 2) {
+        return v;
     }
+
+    int middle = v.size() / 2;
+
+    vector<int> left = v;
+    vector<int> right = v;
+
+    left.erase(left.begin() + middle, left.end());
+    right.erase(right.begin(), right.begin() + middle);
+
+    return merge(mergeSort(left), mergeSort(right));
 }
 
+int main() {    
+    
+    vector<int> a = { 1,2,3,4,5,6 };
+    vector<int> b = { 1,2,3,4,5,6,7};
+    vector <int> c = merge(a, b);
 
-void print(int* A, int size) {
-#pragma omp parallel for
-    for (int i = 0; i < size; i++)
-        printf("%d ", A[i]);
-    printf("\n");
-}
-
-int main() {
-    //int arr[] = { 4,2,7,1,23,1,23,1 };
-    int arr[] = { 3,6,4,1,5,7,2,9,8,10,3,11,14,12,15,19,18,20,17,13,11 };
-
-    print(arr, sizeof(arr) / sizeof(int));
-    merge_sort(arr, 0, sizeof(arr) / sizeof(int) - 1); printf("\n");
-    print(arr, sizeof(arr) / sizeof(int));
-
-    getchar();
+    for (int i = 0;i < c.size(); i++) {
+        cout << c[i] << ' ';
+    }
 }
