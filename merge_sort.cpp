@@ -99,8 +99,8 @@ vector<int> mergeSortWithPragma(vector<int> v) {
 
     left.erase(left.begin() + middle, left.end());
     right.erase(right.begin(), right.begin() + middle);
-
-    #pragma omp parallel 
+    
+    #pragma omp parallel
     {
         left = mergeSortWithPragma(left);
         right = mergeSortWithPragma(right);
@@ -128,19 +128,25 @@ int main() {
     st = omp_get_wtime(); // начало отсчета
     c = mergeSort(a);
     end = omp_get_wtime(); // конец отсчета
-    for (int i = 0;i < c.size(); i++) {
-        cout << c[i] << ' ';
-    }
+    /*
+    //for (int i = 0;i < c.size(); i++) {
+    //    cout << c[i] << ' ';
+    //}
+    */
+    
     cout << "Выполнение алгоритма без прагмы в секундах: " << end - st << endl;
 
     c.clear();
-    cout << "\n\n\n\n\n\-------------------------------------------------------------" << endl;
+    //cout << "\n\n\n\n\n\-------------------------------------------------------------" << endl;
 // ---------------------------------Распараллеливание----------------------------
     st = omp_get_wtime(); // начало отсчета
     c = mergeSortWithPragma(a);
     end = omp_get_wtime(); // конец отсчета
-    for (int i = 0;i < c.size(); i++) {
-        cout << c[i] << ' ';
-    }
+    /*
+    //for (int i = 0;i < c.size(); i++) {
+    //    cout << c[i] << ' ';
+    //}
+    */
+    
     cout << "Выполнение алгоритма c использованием прагмы в секундах: " << end - st << endl;
 }
